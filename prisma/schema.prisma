@@ -58,6 +58,7 @@ model Course {
   updatedAt DateTime @updatedAt
 
   enrollments Enrollment[]
+  sections    CourseSection[]
 
   @@index([instructorId])
   @@index([status])
@@ -77,4 +78,19 @@ model Enrollment {
   @@unique([studentId, courseId])
   @@index([courseId])
   @@index([status])
+}
+
+model CourseSection {
+  id          String  @id @default(cuid())
+  title       String
+  description String? @db.Text
+  order       Int     @default(0)
+
+  courseId String
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([courseId, order])
 }
