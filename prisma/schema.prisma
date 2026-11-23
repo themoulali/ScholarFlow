@@ -26,6 +26,11 @@ enum EnrollmentStatus {
   CANCELLED
 }
 
+enum QuizQuestionType {
+  MCQ
+  TRUE_FALSE
+}
+
 model User {
   id           String   @id @default(cuid())
   name         String
@@ -89,8 +94,103 @@ model CourseSection {
   courseId String
   course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
+  lessons Lesson[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([courseId, order])
+}
+
+model Lesson {
+  id          String  @id @default(cuid())
+  title       String
+  description String? @db.Text
+  order       Int     @default(0)
+
+  sectionId String
+  section   CourseSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+
+  content LessonContent?
+  videos  VideoResource[]
+  quiz    Quiz?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([sectionId, order])
+}
+
+model LessonContent {
+  id          String  @id @default(cuid())
+  contentJson Json
+  markdown    String? @db.Text
+
+  lessonId String @unique
+  lesson   Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model VideoResource {
+  id       String  @id @default(cuid())
+  title    String
+  url      String
+  provider String?
+  order    Int     @default(0)
+
+  lessonId String
+  lesson   Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([lessonId, order])
+}
+
+model Quiz {
+  id          String  @id @default(cuid())
+  title       String
+  description String? @db.Text
+
+  lessonId String @unique
+  lesson   Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  questions QuizQuestion[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model QuizQuestion {
+  id       String           @id @default(cuid())
+  question String           @db.Text
+  type     QuizQuestionType
+  order    Int              @default(0)
+
+  quizId String
+  quiz   Quiz   @relation(fields: [quizId], references: [id], onDelete: Cascade)
+
+  options QuizOption[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([quizId, order])
+}
+
+model QuizOption {
+  id        String  @id @default(cuid())
+  text      String  @db.Text
+  isCorrect Boolean @default(false)
+  order     Int     @default(0)
+
+  questionId String
+  question   QuizQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([questionId, order])
 }

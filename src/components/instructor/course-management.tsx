@@ -1,7 +1,7 @@
-
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
+import SectionManagement from "./section-management";
 
 type Course = {
   id: string;
@@ -375,6 +375,7 @@ export default function CourseManagement() {
                       Delete
                     </button>
                   </div>
+                  <SectionManagement courseId={course.id} />
                 </div>
               </article>
             ))}
