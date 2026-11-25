@@ -2,6 +2,8 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
 import LogoutButton from "@/components/logout-button";
+import CourseCatalog from "@/components/student/course-catalog";
+import EnrolledCourses from "@/components/student/enrolled-courses";
 
 export default async function StudentDashboardPage() {
   const session = await getServerSession(authOptions);
@@ -54,6 +56,8 @@ export default async function StudentDashboardPage() {
             Role: {session.user.role}
           </p>
         </section>
+        <CourseCatalog />
+        <EnrolledCourses />
       </div>
     </main>
   );

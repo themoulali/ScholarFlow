@@ -8,6 +8,15 @@ type RouteContext = {
     courseId: string;
   };
 };
+const allowedCategories = [
+  "Programming",
+  "Web Development",
+  "Data Science",
+  "Artificial Intelligence",
+  "Database",
+  "Other",
+  "General",
+];
 
 export async function GET(
   request: NextRequest,
@@ -41,6 +50,7 @@ export async function GET(
         slug: true,
         description: true,
         thumbnailUrl: true,
+        category: true,
         status: true,
         createdAt: true,
         updatedAt: true,
@@ -130,6 +140,18 @@ export async function PUT(
           ? null
           : existingCourse.thumbnailUrl;
 
+    const category =
+      typeof body.category === "string"
+        ? body.category.trim()
+        : existingCourse.category;
+
+    if (!allowedCategories.includes(category)) {
+      return NextResponse.json(
+        { message: "Please select a valid course category." },
+        { status: 400 }
+      );
+    }
+
     if (title.length < 3 || title.length > 120) {
       return NextResponse.json(
         { message: "Title must contain 3–120 characters." },
@@ -172,6 +194,7 @@ export async function PUT(
         slug: true,
         description: true,
         thumbnailUrl: true,
+        category : true,
         status: true,
         updatedAt: true,
       },

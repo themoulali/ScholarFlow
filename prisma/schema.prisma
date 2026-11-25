@@ -52,6 +52,7 @@ model Course {
   title        String
   slug         String       @unique
   description  String       @db.Text
+  category     String       @default("General")
   thumbnailUrl String?
   status       CourseStatus @default(DRAFT)
   publishedAt  DateTime?
@@ -67,6 +68,7 @@ model Course {
 
   @@index([instructorId])
   @@index([status])
+  @@index([category])
 }
 
 model Enrollment {
@@ -80,9 +82,25 @@ model Enrollment {
   student User   @relation(fields: [studentId], references: [id], onDelete: Cascade)
   course  Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
+  sectionProgress SectionProgress[]
+
   @@unique([studentId, courseId])
   @@index([courseId])
   @@index([status])
+}
+
+model SectionProgress {
+  id          String   @id @default(cuid())
+  completedAt DateTime @default(now())
+
+  enrollmentId String
+  sectionId    String
+
+  enrollment Enrollment    @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  section    CourseSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+
+  @@unique([enrollmentId, sectionId])
+  @@index([sectionId])
 }
 
 model CourseSection {
@@ -94,7 +112,8 @@ model CourseSection {
   courseId String
   course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
-  lessons Lesson[]
+  lessons         Lesson[]
+  progressRecords SectionProgress[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

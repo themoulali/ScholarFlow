@@ -58,6 +58,27 @@ export async function POST(request: NextRequest) {
         ? body.thumbnailUrl.trim()
         : null;
 
+    const allowedCategories = [
+      "Programming",
+      "Web Development",
+      "Data Science",
+      "Artificial Intelligence",
+      "Database",
+      "Other",
+      "General",
+    ];
+
+    const category =
+      typeof body.category === "string"
+        ? body.category.trim()
+        : "Programming";
+
+    if (!allowedCategories.includes(category)) {
+      return NextResponse.json(
+        { message: "Please select a valid course category." },
+        { status: 400 }
+      );
+    }
     // 4. Validate input
     if (title.length < 3 || title.length > 120) {
       return NextResponse.json(
@@ -105,6 +126,7 @@ export async function POST(request: NextRequest) {
         slug,
         description,
         thumbnailUrl: thumbnailUrl || null,
+        category,
         instructorId: session.user.id,
       },
       select: {
@@ -113,6 +135,7 @@ export async function POST(request: NextRequest) {
         slug: true,
         description: true,
         thumbnailUrl: true,
+        category: true,
         status: true,
         createdAt: true,
       },
@@ -183,6 +206,7 @@ export async function GET() {
         slug: true,
         description: true,
         thumbnailUrl: true,
+        category: true,
         status: true,
         createdAt: true,
         updatedAt: true,

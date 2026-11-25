@@ -9,6 +9,7 @@ type Course = {
   slug: string;
   description: string;
   thumbnailUrl: string | null;
+  category: string;
   status: string;
   createdAt: string;
   updatedAt?: string;
@@ -18,12 +19,14 @@ type CourseForm = {
   title: string;
   description: string;
   thumbnailUrl: string;
+  category: string;
 };
 
 const initialForm: CourseForm = {
   title: "",
   description: "",
   thumbnailUrl: "",
+  category: "Programming",
 };
 
 export default function CourseManagement() {
@@ -78,6 +81,7 @@ export default function CourseManagement() {
       title: course.title,
       description: course.description,
       thumbnailUrl: course.thumbnailUrl || "",
+      category: course.category || "General",
     });
 
     setMessage("");
@@ -114,6 +118,7 @@ export default function CourseManagement() {
           title: form.title,
           description: form.description,
           thumbnailUrl: form.thumbnailUrl || null,
+          category: form.category,
         }),
       });
 
@@ -144,6 +149,55 @@ export default function CourseManagement() {
       );
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function handleCourseStatus(
+    course: Course,
+    status: "PUBLISHED" | "ARCHIVED"
+  ) {
+    const action = status === "PUBLISHED" ? "publish" : "archive";
+
+    const confirmed = window.confirm(
+      `Are you sure you want to ${action} "${course.title}"?`
+    );
+
+    if (!confirmed) return;
+
+    try {
+      setMessage("");
+      setError("");
+
+      const response = await fetch(
+        `/api/courses/${course.id}/publish`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ status }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || `Unable to ${action} course.`);
+      }
+
+      setCourses((previous) =>
+        previous.map((item) =>
+          item.id === course.id
+            ? { ...item, ...data.course }
+            : item
+        )
+      );
+
+      setMessage(data.message);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Something went wrong."
+      );
     }
   }
 
@@ -235,6 +289,31 @@ export default function CourseManagement() {
               placeholder="Describe what students will learn..."
               className="w-full rounded-lg border border-gray-300 px-4 py-2 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             />
+            <div>
+              <label
+                htmlFor="course-category"
+                className="mb-1 block text-sm font-medium text-gray-700"
+              >
+                Course Category
+              </label>
+
+              <select
+                id="course-category"
+                required
+                value={form.category}
+                onChange={(event) =>
+                  handleInputChange("category", event.target.value)
+                }
+                className="w-full rounded-lg border border-gray-300 px-4 py-2 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              >
+                <option value="Programming">Programming</option>
+                <option value="Web Development">Web Development</option>
+                <option value="Data Science">Data Science</option>
+                <option value="Artificial Intelligence">Artificial Intelligence</option>
+                <option value="Database">Database</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
           </div>
 
           <div>
@@ -374,6 +453,23 @@ export default function CourseManagement() {
                     >
                       Delete
                     </button>
+                    {course.status === "PUBLISHED" ? (
+                      <button
+                        type="button"
+                        onClick={() => handleCourseStatus(course, "ARCHIVED")}
+                        className="rounded-lg border border-orange-600 px-4 py-2 text-sm font-medium text-orange-600 hover:bg-orange-50"
+                      >
+                        Archive
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => handleCourseStatus(course, "PUBLISHED")}
+                        className="rounded-lg border border-green-600 px-4 py-2 text-sm font-medium text-green-600 hover:bg-green-50"
+                      >
+                        {course.status === "ARCHIVED" ? "Republish" : "Publish"}
+                      </button>
+                    )}
                   </div>
                   <SectionManagement courseId={course.id} />
                 </div>
