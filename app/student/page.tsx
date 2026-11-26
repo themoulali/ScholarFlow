@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import LogoutButton from "@/components/logout-button";
 import CourseCatalog from "@/components/student/course-catalog";
 import EnrolledCourses from "@/components/student/enrolled-courses";
+import AILearningAssistant from "@/components/student/ai-learning-assistant";
 
 export default async function StudentDashboardPage() {
   const session = await getServerSession(authOptions);
@@ -58,6 +59,7 @@ export default async function StudentDashboardPage() {
         </section>
         <CourseCatalog />
         <EnrolledCourses />
+        <AILearningAssistant />
       </div>
     </main>
   );

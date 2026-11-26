@@ -2,6 +2,8 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
 import LogoutButton from "@/components/logout-button";
+import AdminDashboard from "@/components/admin/admin-dashboard";
+import AdminUserManagement from "@/components/admin/admin-user-management";
 
 export default async function AdminDashboardPage() {
   const session = await getServerSession(authOptions);
@@ -52,6 +54,8 @@ export default async function AdminDashboardPage() {
             Role: {session.user.role}
           </p>
         </section>
+        <AdminDashboard />
+        <AdminUserManagement />
       </div>
     </main>
   );
