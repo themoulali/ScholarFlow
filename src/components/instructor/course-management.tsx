@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import SectionManagement from "./section-management";
+import Image from "next/image";
 
 type Course = {
   id: string;
@@ -410,11 +411,16 @@ export default function CourseManagement() {
                 className="overflow-hidden rounded-xl border bg-white shadow-sm"
               >
                 {course.thumbnailUrl && (
-                  <img
-                    src={course.thumbnailUrl}
-                    alt={`${course.title} thumbnail`}
-                    className="h-44 w-full object-cover"
-                  />
+                  <div className="relative h-44 w-full">
+                    <Image
+                      src={course.thumbnailUrl}
+                      alt={`${course.title} thumbnail`}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                      className="object-cover"
+                      unoptimized
+                    />
+                  </div>
                 )}
 
                 <div className="p-5">

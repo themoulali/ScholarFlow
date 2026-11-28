@@ -2,6 +2,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 type Course = {
   id: string;
@@ -198,11 +199,16 @@ export default function CourseCatalog() {
                 className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition hover:shadow-md"
               >
                 {course.thumbnailUrl ? (
-                  <img
-                    src={course.thumbnailUrl}
-                    alt={course.title}
-                    className="h-44 w-full object-cover"
-                  />
+                  <div className="relative h-44 w-full">
+                    <Image
+                      src={course.thumbnailUrl}
+                      alt={course.title}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                      className="object-cover"
+                      unoptimized
+                    />
+                  </div>
                 ) : (
                   <div className="flex h-44 items-center justify-center bg-blue-50 text-4xl font-bold text-blue-600">
                     {course.title.charAt(0).toUpperCase()}

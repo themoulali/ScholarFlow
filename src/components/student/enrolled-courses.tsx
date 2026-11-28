@@ -2,6 +2,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Image from "next/image";
 
 type EnrolledCourse = {
   id: string;
@@ -185,11 +186,16 @@ export default function EnrolledCourses() {
                 className="overflow-hidden rounded-xl border bg-white shadow-sm"
               >
                 {item.course.thumbnailUrl ? (
-                  <img
-                    src={item.course.thumbnailUrl}
-                    alt={item.course.title}
-                    className="h-44 w-full object-cover"
-                  />
+                  <div className="relative h-44 w-full">
+                    <Image
+                      src={item.course.thumbnailUrl}
+                      alt={item.course.title}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                      className="object-cover"
+                      unoptimized
+                    />
+                  </div>
                 ) : (
                   <div className="flex h-44 items-center justify-center bg-gray-100 text-4xl font-bold text-gray-400">
                     {item.course.title.charAt(0).toUpperCase()}
